@@ -1,0 +1,22 @@
+<mat-toolbar color="primary">
+  <a routerLink="/properties" mat-button>
+    <mat-icon>home</mat-icon>
+    <span>Rent Your Room</span>
+  </a>
+
+  <span class="spacer"></span>
+
+  <ng-container *ngIf="isLoggedIn$ | async; else loggedOut">
+    <a routerLink="/add-property" mat-button>Add Property</a>
+    <a routerLink="/my-properties" mat-button>My Properties</a>
+    <a *ngIf="isAdmin" routerLink="/admin/dashboard" mat-button>Admin Dashboard</a>
+    <button mat-icon-button (click)="logout()">
+      <mat-icon>logout</mat-icon>
+    </button>
+  </ng-container>
+
+  <ng-template #loggedOut>
+    <a routerLink="/login" mat-button>Login</a>
+    <a routerLink="/register" mat-button>Register</a>
+  </ng-template>
+</mat-toolbar>

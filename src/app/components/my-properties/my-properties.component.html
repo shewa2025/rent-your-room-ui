@@ -1,0 +1,38 @@
+<div class="my-properties-container">
+  <h1>My Properties</h1>
+
+  <div *ngIf="properties.length > 0; else noProperties" class="properties-list">
+    <mat-card *ngFor="let property of properties" class="property-card">
+      <div class="card-content">
+        <img [src]="property.imageUrl" alt="Photo of {{ property.title }}" class="property-image">
+        <div class="property-details">
+          <mat-card-header>
+            <mat-card-title>{{ property.title }}</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p>{{ property.address }}</p>
+            <p>{{ property.price | currency }} / night</p>
+          </mat-card-content>
+        </div>
+        <div class="property-status">
+          <mat-chip-listbox>
+            <mat-chip [color]="getStatusColor(property.status)" selected>{{ property.status }}</mat-chip>
+          </mat-chip-listbox>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+
+  <ng-template #noProperties>
+    <p>You haven't submitted any properties yet. <a routerLink="/add-property">Add one now!</a></p>
+  </ng-template>
+
+  <mat-paginator
+    *ngIf="properties.length > 0"
+    [length]="totalProperties"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[5, 10, 25]"
+    (page)="onPageChange($event)"
+    aria-label="Select page of properties">
+  </mat-paginator>
+</div>

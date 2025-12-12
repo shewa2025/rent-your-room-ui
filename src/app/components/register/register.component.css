@@ -1,0 +1,25 @@
+
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+}
+
+mat-card {
+  width: 400px;
+}
+
+mat-form-field {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+button {
+  width: 100%;
+}
+
+mat-card-actions {
+  text-align: center;
+  margin-top: 1rem;
+}

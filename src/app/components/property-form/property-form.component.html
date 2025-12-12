@@ -1,0 +1,47 @@
+<div class="form-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Add a New Property</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="propertyForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="fill">
+          <mat-label>Title</mat-label>
+          <input matInput formControlName="title">
+          <mat-error *ngIf="propertyForm.get('title')?.hasError('required')">Title is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Description</mat-label>
+          <textarea matInput formControlName="description"></textarea>
+          <mat-error *ngIf="propertyForm.get('description')?.hasError('required')">Description is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Price (per night)</mat-label>
+          <input matInput formControlName="price" type="number">
+          <mat-error *ngIf="propertyForm.get('price')?.hasError('required')">Price is required</mat-error>
+          <mat-error *ngIf="propertyForm.get('price')?.hasError('min')">Price must be positive</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Address</mat-label>
+          <input matInput formControlName="address">
+          <mat-error *ngIf="propertyForm.get('address')?.hasError('required')">Address is required</mat-error>
+        </mat-form-field>
+
+        <div>
+          <button type="button" mat-stroked-button (click)="fileInput.click()">Choose Image</button>
+          <input hidden (change)="onFileSelected($event)" #fileInput type="file" accept="image/*">
+          <span *ngIf="selectedFile" class="file-name">{{ selectedFile.name }}</span>
+        </div>
+
+        <div *ngIf="imagePreview" class="image-preview">
+          <img [src]="imagePreview" alt="Image Preview">
+        </div>
+
+        <button mat-raised-button color="primary" type="submit" [disabled]="propertyForm.invalid || !selectedFile">Submit for Approval</button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

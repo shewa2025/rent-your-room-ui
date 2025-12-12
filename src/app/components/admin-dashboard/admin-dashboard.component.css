@@ -1,0 +1,42 @@
+
+.admin-container {
+  padding: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.search-bar {
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.property-card {
+  margin-bottom: 1rem;
+}
+
+.card-content {
+  display: flex;
+  align-items: center;
+}
+
+.property-image {
+  width: 200px;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-right: 1.5rem;
+}
+
+.property-details {
+  flex-grow: 1;
+}
+
+.property-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+mat-paginator {
+  margin-top: 2rem;
+}

@@ -1,0 +1,32 @@
+
+.detail-container {
+  padding: 2rem;
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+}
+
+mat-card {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.address {
+  color: rgba(0,0,0,.54);
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.price {
+  font-weight: bold;
+  font-size: 1.5rem;
+  margin-top: 1rem;
+}
+
+.back-button {
+  margin-bottom: 1rem;
+}

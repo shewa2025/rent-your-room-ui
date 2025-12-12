@@ -1,0 +1,54 @@
+<div class="admin-container">
+  <h1>Admin Dashboard</h1>
+
+  <div class="filters">
+    <mat-form-field class="search-bar" appearance="fill">
+      <mat-label>Search Properties</mat-label>
+      <input matInput [formControl]="searchControl" placeholder="e.g., Lake Cabin">
+    </mat-form-field>
+
+    <mat-form-field class="status-filter" appearance="fill">
+      <mat-label>Filter by Status</mat-label>
+      <mat-select [formControl]="statusControl">
+        <mat-option *ngFor="let status of statuses" [value]="status">{{ status }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div *ngIf="properties.length > 0; else noProperties" class="properties-list">
+    <mat-card *ngFor="let property of properties" class="property-card">
+      <div class="card-content">
+        <img [src]="property.imageUrl" alt="Photo of {{ property.title }}" class="property-image">
+        <div class="property-details">
+          <mat-card-header>
+            <mat-card-title>{{ property.title }}</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p><strong>Address:</strong> {{ property.address }}</p>
+            <p><strong>Price:</strong> {{ property.price | currency }} / night</p>
+            <p><strong>Owner:</strong> {{ property.owner.name }} ({{ property.owner.email }})</p>
+            <p><strong>Status:</strong> {{ property.status }}</p>
+            <a mat-button [routerLink]="['/properties', property.id]" target="_blank">View Details</a>
+          </mat-card-content>
+        </div>
+        <div class="property-actions" *ngIf="property.status === 'PENDING'">
+          <button mat-flat-button color="primary" (click)="approve(property.id)">Approve</button>
+          <button mat-flat-button color="warn" (click)="reject(property.id)">Reject</button>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+
+  <ng-template #noProperties>
+    <p>No properties found.</p>
+  </ng-template>
+
+  <mat-paginator
+    *ngIf="properties.length > 0"
+    [length]="totalProperties"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[5, 10, 25]"
+    (page)="onPageChange($event)"
+    aria-label="Select page of properties">
+  </mat-paginator>
+</div>

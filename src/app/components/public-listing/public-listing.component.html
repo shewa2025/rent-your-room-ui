@@ -1,0 +1,37 @@
+<div class="listing-container">
+  <h1>Available Properties</h1>
+
+  <mat-form-field class="search-bar" appearance="fill">
+    <mat-label>Search Properties</mat-label>
+    <input matInput [formControl]="searchControl" placeholder="e.g., Beach House">
+  </mat-form-field>
+
+  <div *ngIf="properties.length > 0; else noProperties" class="property-grid">
+    <mat-card *ngFor="let property of properties" class="property-card">
+      <img mat-card-image [src]="property.imageUrl" alt="Photo of {{ property.title }}">
+      <mat-card-header>
+        <mat-card-title>{{ property.title }}</mat-card-title>
+        <mat-card-subtitle>{{ property.address }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>{{ property.description | slice:0:100 }}...</p>
+        <p class="price">{{ property.price | currency }} / night</p>
+      </mat-card-content>
+      <mat-card-actions>
+        <a mat-button color="primary" [routerLink]="['/properties', property.id]">View Details</a>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <ng-template #noProperties>
+    <p>No properties found.</p>
+  </ng-template>
+
+  <mat-paginator
+    [length]="totalProperties"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[5, 10, 25]"
+    (page)="onPageChange($event)"
+    aria-label="Select page of properties">
+  </mat-paginator>
+</div>
