@@ -22,7 +22,10 @@ export class PropertyService {
   createProperty(formData: FormData): Observable<Property> {
     return this.http.post<Property>(this.apiUrl, formData).pipe(
       catchError((error: HttpErrorResponse) => {
-        if (error.status === 413 || (error.error && typeof error.error === 'string' && error.error.includes('Maximum upload size exceeded'))) {
+        if (error.status === 401) {
+          this.notificationService.showError('Authentication failed. Please log in again.');
+          this.authService.logout();
+        } else if (error.status === 413 || (error.error && typeof error.error === 'string' && error.error.includes('Maximum upload size exceeded'))) {
           this.notificationService.showError('The selected image is too large. Please choose a smaller file. The maximum file size is 1MB.');
         } else {
           this.notificationService.showError('An error occurred while creating the property.');
@@ -46,7 +49,11 @@ export class PropertyService {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('limit', limit.toString());
-    return this.http.get<{data: Property[], total: number}>(`${this.apiUrl}/my-properties`, { params });
+    const token = this.authService.getToken();
+    const headers = {
+      Authorization: `Bearer ${token}`
+    };
+    return this.http.get<{data: Property[], total: number}>(`${this.apiUrl}/my-rooms`, { params, headers });
   }
 
   getPropertyById(id: string): Observable<Property> {
