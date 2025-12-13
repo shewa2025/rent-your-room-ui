@@ -20,11 +20,7 @@ export class PropertyService {
   ) { }
 
   createProperty(formData: FormData): Observable<Property> {
-    const token = this.authService.getToken();
-    const headers = {
-      Authorization: `Bearer ${token}`
-    };
-    return this.http.post<Property>(this.apiUrl, formData, { headers }).pipe(
+    return this.http.post<Property>(this.apiUrl, formData).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
           this.notificationService.showError('Authentication failed. Please log in again.');
@@ -53,11 +49,7 @@ export class PropertyService {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('limit', limit.toString());
-    const token = this.authService.getToken();
-    const headers = {
-      Authorization: `Bearer ${token}`
-    };
-    return this.http.get<{data: Property[], total: number}>(`${this.apiUrl}/my-rooms`, { params, headers });
+    return this.http.get<{data: Property[], total: number}>(`${this.apiUrl}/my-rooms`, { params });
   }
 
   getPropertyById(id: string): Observable<Property> {

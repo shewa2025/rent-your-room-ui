@@ -8,7 +8,7 @@ export const adminGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const notificationService = inject(NotificationService);
 
-  if (authService.getToken() && authService.getUserRole() === 'ADMIN') {
+  if (authService.getToken() && authService.getUserRole() === 'USER') {
     return true;
   } else {
     notificationService.showError('You do not have permission to view this page.');
