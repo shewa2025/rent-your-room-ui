@@ -13,6 +13,10 @@ export class AuthService {
   private _isLoggedIn$ = new BehaviorSubject<boolean>(this.hasToken());
   isLoggedIn$ = this._isLoggedIn$.asObservable();
 
+  get isLoggedIn(): boolean {
+    return this._isLoggedIn$.value;
+  }
+
   constructor(private http: HttpClient, private router: Router) {}
 
   private hasToken(): boolean {

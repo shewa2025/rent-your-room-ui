@@ -8,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-property-form',
@@ -33,7 +34,8 @@ export class PropertyFormComponent implements OnInit {
     private fb: FormBuilder,
     private propertyService: PropertyService,
     private notificationService: NotificationService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {
     this.propertyForm = this.fb.group({
       title: ['', Validators.required],
@@ -58,6 +60,12 @@ export class PropertyFormComponent implements OnInit {
   }
 
   onSubmit(): void {
+    if (!this.authService.isLoggedIn) {
+      this.notificationService.showError('You must be logged in to create a property.');
+      this.router.navigate(['/login']);
+      return;
+    }
+
     if (this.propertyForm.valid && this.selectedFile) {
       const formData = new FormData();
       Object.keys(this.propertyForm.value).forEach(key => {
