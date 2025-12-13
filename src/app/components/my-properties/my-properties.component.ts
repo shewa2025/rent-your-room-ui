@@ -37,7 +37,7 @@ export class MyPropertiesComponent implements OnInit {
   loadProperties(): void {
     this.propertyService.getUserProperties(this.currentPage, this.pageSize)
       .subscribe(response => {
-        this.properties = response.data;
+        this.properties = response.data || [];
         this.totalProperties = response.total;
       });
   }

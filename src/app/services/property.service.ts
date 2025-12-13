@@ -20,7 +20,11 @@ export class PropertyService {
   ) { }
 
   createProperty(formData: FormData): Observable<Property> {
-    return this.http.post<Property>(this.apiUrl, formData).pipe(
+    const token = this.authService.getToken();
+    const headers = {
+      Authorization: `Bearer ${token}`
+    };
+    return this.http.post<Property>(this.apiUrl, formData, { headers }).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
           this.notificationService.showError('Authentication failed. Please log in again.');
