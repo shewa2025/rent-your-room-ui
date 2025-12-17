@@ -6,7 +6,11 @@
     <input matInput [formControl]="searchControl" placeholder="e.g., Beach House">
   </mat-form-field>
 
-  <div *ngIf="properties.length > 0; else noProperties" class="property-grid">
+  <div *ngIf="isLoading" class="loading-spinner">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <div *ngIf="!isLoading && properties.length > 0; else noProperties" class="property-grid">
     <mat-card *ngFor="let property of properties" class="property-card">
       <img mat-card-image [src]="property.imageUrl" alt="Photo of {{ property.title }}">
       <mat-card-header>
@@ -24,10 +28,11 @@
   </div>
 
   <ng-template #noProperties>
-    <p>No properties found.</p>
+    <p *ngIf="!isLoading">No properties found.</p>
   </ng-template>
 
   <mat-paginator
+    *ngIf="!isLoading"
     [length]="totalProperties"
     [pageSize]="pageSize"
     [pageSizeOptions]="[5, 10, 25]"

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { PropertyService } from '../../services/property.service';
 import { Property } from '../../models/property.model';
 import { CommonModule } from '@angular/common';
@@ -9,10 +9,10 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { catchError, debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
-import { NotificationService } from '../../services/notification.service';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-public-listing',
@@ -25,17 +25,20 @@ import { NotificationService } from '../../services/notification.service';
     MatButtonModule,
     MatPaginatorModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './public-listing.component.html',
   styleUrls: ['./public-listing.component.css']
 })
-export class PublicListingComponent implements OnInit {
+export class PublicListingComponent implements OnInit, OnDestroy {
   properties: Property[] = [];
   totalProperties = 0;
   pageSize = 10;
   currentPage = 0;
   searchControl = new FormControl('');
+  isLoading = false;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private propertyService: PropertyService,
@@ -48,14 +51,21 @@ export class PublicListingComponent implements OnInit {
     this.loadProperties();
     this.searchControl.valueChanges.pipe(
       debounceTime(300),
-      distinctUntilChanged()
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
     ).subscribe(() => {
       this.currentPage = 0;
       this.loadProperties();
     });
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   loadProperties(): void {
+    this.isLoading = true;
     const searchTerm = this.searchControl.value || '';
     this.propertyService.getProperties(this.currentPage, this.pageSize, searchTerm)
       .pipe(
@@ -66,12 +76,15 @@ export class PublicListingComponent implements OnInit {
               this.router.navigate(['/login']);
             }
           }
+          this.isLoading = false;
           return of({ data: [], total: 0 }); // Return an empty observable to prevent the app from crashing
-        })
+        }),
+        takeUntil(this.destroy$)
       )
       .subscribe(response => {
         this.properties = response.data;
         this.totalProperties = response.total;
+        this.isLoading = false;
       });
   }
 

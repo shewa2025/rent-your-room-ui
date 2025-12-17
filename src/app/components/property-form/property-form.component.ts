@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { PropertyService } from '../../services/property.service';
@@ -8,7 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../services/auth.service';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-property-form',
@@ -20,15 +20,19 @@ import { AuthService } from '../../services/auth.service';
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule
+    MatButtonModule,
+    MatProgressSpinnerModule
   ],
+
   templateUrl: './property-form.component.html',
   styleUrls: ['./property-form.component.css']
 })
-export class PropertyFormComponent implements OnInit {
+export class PropertyFormComponent implements OnInit, OnDestroy {
   propertyForm: FormGroup;
   selectedFile: File | null = null;
   imagePreview: string | ArrayBuffer | null = null;
+  isSubmitting = false;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private fb: FormBuilder,
@@ -46,6 +50,11 @@ export class PropertyFormComponent implements OnInit {
   }
 
   ngOnInit(): void {}
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   onFileSelected(event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0];
@@ -67,23 +76,28 @@ export class PropertyFormComponent implements OnInit {
     }
 
     if (this.propertyForm.valid && this.selectedFile) {
+      this.isSubmitting = true;
       const formData = new FormData();
       Object.keys(this.propertyForm.value).forEach(key => {
         formData.append(key, this.propertyForm.value[key]);
       });
       formData.append('image', this.selectedFile, this.selectedFile.name);
 
-      this.propertyService.createProperty(formData).subscribe({
-        next: () => {
-          this.notificationService.showSuccess('Property submitted for approval!');
-          this.router.navigate(['/my-properties']);
-        },
-        error: () => {
-          // The error is already handled and notified by the service/interceptor
-          // but we can add component-specific logic here if needed.
-          console.error('Failed to create property');
-        }
-      });
+      this.propertyService.createProperty(formData)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.notificationService.showSuccess('Property submitted for approval!');
+            this.router.navigate(['/my-properties']);
+            this.isSubmitting = false;
+          },
+          error: () => {
+            // The error is already handled and notified by the service/interceptor
+            // but we can add component-specific logic here if needed.
+            console.error('Failed to create property');
+            this.isSubmitting = false;
+          }
+        });
     } else {
       this.notificationService.showError('Please fill out the form completely and select an image.');
     }

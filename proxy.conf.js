@@ -8,12 +8,12 @@ const PROXY_CONFIG = [
     changeOrigin: true,
     logLevel: "debug",
     onProxyReq: (proxyReq, req, res) => {
-      console.log('onProxyReq called');
+      console.log('[proxy] onProxyReq called');
       if (req.headers.authorization) {
-        console.log('Authorization header found:', req.headers.authorization);
+        console.log('[proxy] Authorization header found:', req.headers.authorization);
         proxyReq.setHeader('Authorization', req.headers.authorization);
       } else {
-        console.log('Authorization header not found');
+        console.log('[proxy] Authorization header not found');
       }
     }
   }

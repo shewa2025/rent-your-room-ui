@@ -40,7 +40,10 @@
           <img [src]="imagePreview" alt="Image Preview">
         </div>
 
-        <button mat-raised-button color="primary" type="submit" [disabled]="propertyForm.invalid || !selectedFile">Submit for Approval</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="propertyForm.invalid || !selectedFile || isSubmitting">
+          <span *ngIf="!isSubmitting">Submit for Approval</span>
+          <mat-spinner *ngIf="isSubmitting" [diameter]="24"></mat-spinner>
+        </button>
       </form>
     </mat-card-content>
   </mat-card>
