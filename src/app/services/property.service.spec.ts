@@ -43,7 +43,7 @@ describe('PropertyService', () => {
       expect(res).toEqual(dummyProperties);
     });
 
-    const req = httpMock.expectOne('/api/properties?page=0&limit=10');
+    const req = httpMock.expectOne('/api/rooms?page=0&limit=10');
     expect(req.request.method).toBe('GET');
     req.flush(dummyProperties);
   });
@@ -53,7 +53,7 @@ describe('PropertyService', () => {
       expect(res).toEqual(mockProperty);
     });
 
-    const req = httpMock.expectOne('/api/properties/1');
+    const req = httpMock.expectOne('/api/rooms/1');
     expect(req.request.method).toBe('GET');
     req.flush(mockProperty);
   });
@@ -61,7 +61,7 @@ describe('PropertyService', () => {
   it('should approve a property', () => {
     service.approveProperty('1').subscribe();
 
-    const req = httpMock.expectOne('/api/admin/properties/1/approve');
+    const req = httpMock.expectOne('/api/admin/rooms/1/approve');
     expect(req.request.method).toBe('PUT');
     req.flush({});
   });

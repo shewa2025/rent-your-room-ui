@@ -33,7 +33,7 @@ describe('AuthService', () => {
       expect(res).toEqual(dummyResponse);
     });
 
-    const req = httpMock.expectOne('/api/auth/login');
+    const req = httpMock.expectOne('/api/auth/signin');
     expect(req.request.method).toBe('POST');
     req.flush(dummyResponse);
 

@@ -42,18 +42,33 @@ export class PropertyService {
     if (searchTerm) {
       params = params.set('search', searchTerm);
     }
-    return this.http.get<{data: Property[], total: number}>(this.apiUrl, { params });
+    return this.http.get<{data: Property[], total: number}>(this.apiUrl, { params }).pipe(
+      catchError((error: HttpErrorResponse) => {
+        this.notificationService.showError('An error occurred while fetching properties.');
+        return throwError(() => error);
+      })
+    );
   }
 
   getUserProperties(page: number, limit: number): Observable<{data: Property[], total: number}> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('limit', limit.toString());
-    return this.http.get<{data: Property[], total: number}>(`${this.apiUrl}/my-rooms`, { params });
+    return this.http.get<{data: Property[], total: number}>(`${this.apiUrl}/my-rooms`, { params }).pipe(
+      catchError((error: HttpErrorResponse) => {
+        this.notificationService.showError('An error occurred while fetching your properties.');
+        return throwError(() => error);
+      })
+    );
   }
 
   getPropertyById(id: string): Observable<Property> {
-    return this.http.get<Property>(`${this.apiUrl}/${id}`);
+    return this.http.get<Property>(`${this.apiUrl}/${id}`).pipe(
+      catchError((error: HttpErrorResponse) => {
+        this.notificationService.showError('An error occurred while fetching the property details.');
+        return throwError(() => error);
+      })
+    );
   }
 
   getPendingProperties(page: number, limit: number, searchTerm: string = ''): Observable<{data: Property[], total: number}> {
@@ -63,7 +78,12 @@ export class PropertyService {
     if (searchTerm) {
       params = params.set('search', searchTerm);
     }
-    return this.http.get<{data: Property[], total: number}>(`${this.adminUrl}/pending`, { params });
+    return this.http.get<{data: Property[], total: number}>(`${this.adminUrl}/pending`, { params }).pipe(
+      catchError((error: HttpErrorResponse) => {
+        this.notificationService.showError('An error occurred while fetching pending properties.');
+        return throwError(() => error);
+      })
+    );
   }
 
   getAllProperties(page: number, limit: number, searchTerm: string = '', status: string = ''): Observable<{data: Property[], total: number}> {
@@ -76,14 +96,29 @@ export class PropertyService {
     if (status) {
       params = params.set('status', status);
     }
-    return this.http.get<{data: Property[], total: number}>(this.adminUrl, { params });
+    return this.http.get<{data: Property[], total: number}>(this.adminUrl, { params }).pipe(
+      catchError((error: HttpErrorResponse) => {
+        this.notificationService.showError('An error occurred while fetching all properties.');
+        return throwError(() => error);
+      })
+    );
   }
 
   approveProperty(id: string): Observable<any> {
-    return this.http.put(`${this.adminUrl}/${id}/approve`, {});
+    return this.http.put(`${this.adminUrl}/${id}/approve`, {}).pipe(
+      catchError((error: HttpErrorResponse) => {
+        this.notificationService.showError('An error occurred while approving the property.');
+        return throwError(() => error);
+      })
+    );
   }
 
   rejectProperty(id: string): Observable<any> {
-    return this.http.put(`${this.adminUrl}/${id}/reject`, {});
+    return this.http.put(`${this.adminUrl}/${id}/reject`, {}).pipe(
+      catchError((error: HttpErrorResponse) => {
+        this.notificationService.showError('An error occurred while rejecting the property.');
+        return throwError(() => error);
+      })
+    );
   }
 }
