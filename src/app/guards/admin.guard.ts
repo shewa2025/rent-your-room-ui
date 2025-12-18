@@ -8,10 +8,15 @@ export const adminGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const notificationService = inject(NotificationService);
 
-  if (authService.getToken() && authService.getUserRole() === 'ADMIN') {
+  if (authService.getToken() && !authService.isTokenExpired() && authService.getUserRole() === 'ADMIN') {
     return true;
   } else {
-    notificationService.showError('You do not have permission to view this page.');
+    if (authService.isTokenExpired()) {
+      notificationService.showError('Your session has expired. Please log in again.');
+      authService.logout();
+    } else {
+      notificationService.showError('You do not have permission to view this page.');
+    }
     router.navigate(['/properties']);
     return false;
   }

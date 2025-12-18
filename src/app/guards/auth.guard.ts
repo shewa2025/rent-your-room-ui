@@ -8,10 +8,15 @@ export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const notificationService = inject(NotificationService);
 
-  if (authService.getToken()) {
+  if (authService.getToken() && !authService.isTokenExpired()) {
     return true;
   } else {
-    notificationService.showError('You must be logged in to view this page.');
+    if (authService.isTokenExpired()) {
+      notificationService.showError('Your session has expired. Please log in again.');
+      authService.logout();
+    } else {
+      notificationService.showError('You must be logged in to view this page.');
+    }
     router.navigate(['/login']);
     return false;
   }

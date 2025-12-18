@@ -44,6 +44,7 @@ export class LoginComponent {
       this.authService.login(this.loginForm.value).subscribe({
         next: () => {
           this.notificationService.showSuccess('Login successful!');
+          console.log('Attempting to navigate to /properties');
           this.router.navigate(['/properties']);
         },
         error: (err) => {

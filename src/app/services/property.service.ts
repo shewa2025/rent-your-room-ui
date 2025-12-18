@@ -22,6 +22,7 @@ export class PropertyService {
   createProperty(formData: FormData): Observable<Property> {
     return this.http.post<Property>(this.apiUrl, formData).pipe(
       catchError((error: HttpErrorResponse) => {
+        console.error('Create property error:', error);
         if (error.status === 401) {
           this.notificationService.showError('Authentication failed. Please log in again.');
           this.authService.logout();
@@ -42,9 +43,14 @@ export class PropertyService {
     if (searchTerm) {
       params = params.set('search', searchTerm);
     }
-    return this.http.get<{data: Property[], total: number}>(this.apiUrl, { params }).pipe(
+    return this.http.get<{data: Property[], total: number}>(`${this.apiUrl}/my-rooms`, { params }).pipe(
       catchError((error: HttpErrorResponse) => {
-        this.notificationService.showError('An error occurred while fetching properties.');
+        if (error.status === 401) {
+          this.notificationService.showError('Authentication failed. Please log in again.');
+          this.authService.logout();
+        } else {
+          this.notificationService.showError('An error occurred while fetching properties.');
+        }
         return throwError(() => error);
       })
     );

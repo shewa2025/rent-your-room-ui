@@ -44,7 +44,8 @@ export class AuthService {
   }
 
   getToken(): string | null {
-    return localStorage.getItem('token');
+    const token = localStorage.getItem('token');
+    return token ? token.trim() : null;
   }
 
   getUserRole(): 'USER' | 'ADMIN' | null {
@@ -58,6 +59,23 @@ export class AuthService {
     } catch (e) {
       console.error('Error decoding JWT', e);
       return null;
+    }
+  }
+
+  isTokenExpired(): boolean {
+    const token = this.getToken();
+    if (!token) {
+      return true;
+    }
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload.exp) {
+        const expiry = payload.exp * 1000;
+        return (Date.now() > expiry);
+      }
+      return false;
+    } catch (e) {
+      return true;
     }
   }
 }

@@ -12,6 +12,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { catchError, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { of, Subject } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
+import { NotificationService } from '../../services/notification.service';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
@@ -81,9 +82,9 @@ export class PublicListingComponent implements OnInit, OnDestroy {
         }),
         takeUntil(this.destroy$)
       )
-      .subscribe(response => {
-        this.properties = response.data;
-        this.totalProperties = response.total;
+      .subscribe((response: any) => {
+        this.properties = response.data || response;
+        this.totalProperties = response.total || (response ? response.length : 0);
         this.isLoading = false;
       });
   }
