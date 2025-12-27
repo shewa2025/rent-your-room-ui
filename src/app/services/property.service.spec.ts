@@ -37,13 +37,13 @@ describe('PropertyService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should get properties', () => {
+  it('should get public properties', () => {
     const dummyProperties = { data: [mockProperty], total: 1 };
-    service.getProperties(0, 10).subscribe(res => {
+    service.getPublicProperties(0, 10).subscribe(res => {
       expect(res).toEqual(dummyProperties);
     });
 
-    const req = httpMock.expectOne('/api/rooms?page=0&limit=10');
+    const req = httpMock.expectOne('/api/public/rooms?page=0&limit=10');
     expect(req.request.method).toBe('GET');
     req.flush(dummyProperties);
   });
@@ -53,7 +53,7 @@ describe('PropertyService', () => {
       expect(res).toEqual(mockProperty);
     });
 
-    const req = httpMock.expectOne('/api/rooms/1');
+    const req = httpMock.expectOne('/api/public/rooms/1');
     expect(req.request.method).toBe('GET');
     req.flush(mockProperty);
   });

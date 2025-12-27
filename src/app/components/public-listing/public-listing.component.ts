@@ -68,7 +68,7 @@ export class PublicListingComponent implements OnInit, OnDestroy {
   loadProperties(): void {
     this.isLoading = true;
     const searchTerm = this.searchControl.value || '';
-    this.propertyService.getProperties(this.currentPage, this.pageSize, searchTerm)
+    this.propertyService.getPublicProperties(this.currentPage, this.pageSize, searchTerm)
       .pipe(
         catchError(error => {
           if (error.status === 401) {

@@ -10,6 +10,7 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class PropertyService {
+  private publicApiUrl = '/api/public/rooms';
   private apiUrl = '/api/rooms';
   private adminUrl = '/api/admin/rooms';
 
@@ -36,14 +37,14 @@ export class PropertyService {
     );
   }
 
-  getProperties(page: number, limit: number, searchTerm: string = ''): Observable<{data: Property[], total: number}> {
+  getPublicProperties(page: number, limit: number, searchTerm: string = ''): Observable<{data: Property[], total: number}> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('limit', limit.toString());
     if (searchTerm) {
       params = params.set('search', searchTerm);
     }
-    return this.http.get<{data: Property[], total: number}>(`${this.apiUrl}/my-rooms`, { params }).pipe(
+    return this.http.get<{data: Property[], total: number}>(this.publicApiUrl, { params }).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
           this.notificationService.showError('Authentication failed. Please log in again.');
@@ -69,7 +70,7 @@ export class PropertyService {
   }
 
   getPropertyById(id: string): Observable<Property> {
-    return this.http.get<Property>(`${this.apiUrl}/${id}`).pipe(
+    return this.http.get<Property>(`${this.publicApiUrl}/${id}`).pipe(
       catchError((error: HttpErrorResponse) => {
         this.notificationService.showError('An error occurred while fetching the property details.');
         return throwError(() => error);
