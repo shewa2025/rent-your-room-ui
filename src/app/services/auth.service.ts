@@ -40,6 +40,7 @@ export class AuthService {
   login(credentials: {username: string, password: string}): Observable<JwtResponse> {
     return this.http.post<JwtResponse>(`${this.apiUrl}/signin`, credentials).pipe(
       tap(response => {
+        console.log('Backend login response:', response);
         this.handleAuthentication(response);
       })
     );

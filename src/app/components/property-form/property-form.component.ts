@@ -30,6 +30,7 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './property-form.component.html',
   styleUrls: ['./property-form.component.css']
 })
+
 export class PropertyFormComponent implements OnInit, OnDestroy {
   propertyForm: FormGroup;
   selectedFile: File | null = null;
@@ -47,8 +48,14 @@ export class PropertyFormComponent implements OnInit, OnDestroy {
     this.propertyForm = this.fb.group({
       title: ['', Validators.required],
       description: ['', Validators.required],
-      price: ['', [Validators.required, Validators.min(0)]],
-      address: ['', Validators.required]
+      rent: ['', [Validators.required, Validators.min(0)]],
+      address: this.fb.group({
+        street: ['', Validators.required],
+        city: ['', Validators.required],
+        state: ['', Validators.required],
+        zipCode: ['', Validators.required],
+        country: ['', Validators.required]
+      })
     });
   }
 
@@ -82,7 +89,6 @@ export class PropertyFormComponent implements OnInit, OnDestroy {
       this.isSubmitting = true;
       const formData = new FormData();
       
-      // Backend expects a 'room' part with JSON data and an 'image' part for the file.
       const roomData = this.propertyForm.value;
       formData.append('room', new Blob([JSON.stringify(roomData)], { type: 'application/json' }));
       
@@ -97,8 +103,6 @@ export class PropertyFormComponent implements OnInit, OnDestroy {
             this.isSubmitting = false;
           },
           error: () => {
-            // The error is already handled and notified by the service/interceptor
-            // but we can add component-specific logic here if needed.
             console.error('Failed to create property');
             this.isSubmitting = false;
           }

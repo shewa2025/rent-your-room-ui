@@ -18,17 +18,40 @@
         </mat-form-field>
 
         <mat-form-field appearance="fill">
-          <mat-label>Price (per night)</mat-label>
-          <input matInput formControlName="price" type="number">
-          <mat-error *ngIf="propertyForm.get('price')?.hasError('required')">Price is required</mat-error>
-          <mat-error *ngIf="propertyForm.get('price')?.hasError('min')">Price must be positive</mat-error>
+          <mat-label>Rent (per night)</mat-label>
+          <input matInput formControlName="rent" type="number">
+          <mat-error *ngIf="propertyForm.get('rent')?.hasError('required')">Rent is required</mat-error>
+          <mat-error *ngIf="propertyForm.get('rent')?.hasError('min')">Rent must be positive</mat-error>
         </mat-form-field>
 
-        <mat-form-field appearance="fill">
-          <mat-label>Address</mat-label>
-          <input matInput formControlName="address">
-          <mat-error *ngIf="propertyForm.get('address')?.hasError('required')">Address is required</mat-error>
-        </mat-form-field>
+        <div formGroupName="address">
+          <h3>Address</h3>
+          <mat-form-field appearance="fill">
+            <mat-label>Street</mat-label>
+            <input matInput formControlName="street">
+            <mat-error *ngIf="propertyForm.get('address.street')?.hasError('required')">Street is required</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>City</mat-label>
+            <input matInput formControlName="city">
+            <mat-error *ngIf="propertyForm.get('address.city')?.hasError('required')">City is required</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>State</mat-label>
+            <input matInput formControlName="state">
+            <mat-error *ngIf="propertyForm.get('address.state')?.hasError('required')">State is required</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Zip Code</mat-label>
+            <input matInput formControlName="zipCode">
+            <mat-error *ngIf="propertyForm.get('address.zipCode')?.hasError('required')">Zip Code is required</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Country</mat-label>
+            <input matInput formControlName="country">
+            <mat-error *ngIf="propertyForm.get('address.country')?.hasError('required')">Country is required</mat-error>
+          </mat-form-field>
+        </div>
 
         <div>
           <button type="button" mat-stroked-button (click)="fileInput.click()">Choose Image</button>
