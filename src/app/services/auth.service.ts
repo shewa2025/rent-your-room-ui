@@ -1,9 +1,19 @@
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { User } from '../models/user.model';
 import { Router } from '@angular/router';
+
+interface JwtResponse {
+  token: string;
+  refreshToken: string;
+  id: string;
+  username: string;
+  email: string;
+  roles: string[];
+}
 
 @Injectable({
   providedIn: 'root'
@@ -27,39 +37,59 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/signup`, user);
   }
 
-  login(credentials: {username: string, password: string}): Observable<{token: string}> {
-    return this.http.post<{token: string}>(`${this.apiUrl}/signin`, credentials).pipe(
+  login(credentials: {username: string, password: string}): Observable<JwtResponse> {
+    return this.http.post<JwtResponse>(`${this.apiUrl}/signin`, credentials).pipe(
       tap(response => {
-        console.log('Login successful, token received:', response.token);
-        localStorage.setItem('token', response.token);
-        this._isLoggedIn$.next(true);
+        this.handleAuthentication(response);
       })
     );
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    this._isLoggedIn$.next(false);
-    this.router.navigate(['/login']);
+    this.http.post(`${this.apiUrl}/signout`, {}).subscribe(() => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('roles');
+      this._isLoggedIn$.next(false);
+      this.router.navigate(['/login']);
+    });
+  }
+
+  refreshToken(): Observable<any> {
+    const refreshToken = this.getRefreshToken();
+    return this.http.post(`${this.apiUrl}/refreshtoken`, { refreshToken }).pipe(
+      tap((response: any) => {
+        localStorage.setItem('token', response.token);
+      })
+    );
   }
 
   getToken(): string | null {
-    const token = localStorage.getItem('token');
-    return token ? token.trim() : null;
+    return localStorage.getItem('token');
+  }
+
+  getRefreshToken(): string | null {
+    return localStorage.getItem('refreshToken');
   }
 
   getUserRole(): 'USER' | 'ADMIN' | null {
-    const token = this.getToken();
-    if (!token) {
-      return null;
+    const roles = localStorage.getItem('roles');
+    if (roles) {
+      const parsedRoles = JSON.parse(roles);
+      if (parsedRoles.includes('ROLE_ADMIN')) {
+        return 'ADMIN';
+      } else if (parsedRoles.includes('ROLE_USER')) {
+        return 'USER';
+      }
     }
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.role;
-    } catch (e) {
-      console.error('Error decoding JWT', e);
-      return null;
-    }
+    return null;
+  }
+
+  private handleAuthentication(response: JwtResponse): void {
+    localStorage.setItem('token', response.token);
+    localStorage.setItem('refreshToken', response.refreshToken);
+    localStorage.setItem('roles', JSON.stringify(response.roles));
+    this._isLoggedIn$.next(true);
   }
 
   isTokenExpired(): boolean {

@@ -1,3 +1,4 @@
+
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { PropertyService } from '../../services/property.service';
@@ -9,6 +10,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { NotificationService } from '../../services/notification.service';
+import { ReviewFormComponent } from '../review-form/review-form.component';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-property-detail',
@@ -18,7 +21,8 @@ import { NotificationService } from '../../services/notification.service';
     RouterModule,
     MatCardModule,
     MatProgressSpinnerModule,
-    MatIconModule
+    MatIconModule,
+    ReviewFormComponent
   ],
   templateUrl: './property-detail.component.html',
   styleUrls: ['./property-detail.component.css']
@@ -31,12 +35,18 @@ export class PropertyDetailComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private propertyService: PropertyService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    public authService: AuthService
   ) { }
 
   ngOnInit(): void {
+    this.loadProperty();
+  }
+
+  loadProperty(): void {
     const propertyId = this.route.snapshot.paramMap.get('id');
     if (propertyId) {
+      this.isLoading = true;
       this.propertyService.getPropertyById(propertyId)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
@@ -51,6 +61,10 @@ export class PropertyDetailComponent implements OnInit, OnDestroy {
           }
         });
     }
+  }
+
+  reloadProperty(): void {
+    this.loadProperty();
   }
 
   ngOnDestroy(): void {

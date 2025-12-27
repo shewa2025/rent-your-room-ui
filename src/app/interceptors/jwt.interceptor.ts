@@ -1,44 +1,41 @@
-import { HttpInterceptorFn, HttpRequest, HttpHandlerFn } from '@angular/common/http';
+import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { throwError } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
-import { switchMap, take } from 'rxjs/operators';
 
-export const jwtInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn) => {
+export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
+  const token = authService.getToken();
 
-  return authService.isLoggedIn$.pipe(
-    take(1), // Take only the first value
-    switchMap(isLoggedIn => {
-      const token = authService.getToken();
-      console.log('JWT Interceptor called for URL:', req.url);
-      console.log('isLoggedIn status:', isLoggedIn);
-      console.log('Token from authService:', token);
+  if (token) {
+    req = req.clone({
+      setHeaders: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
 
-      if (isLoggedIn && token) {
-        console.log('Token found, cloning request with Authorization header.');
-        
-        let cloned: HttpRequest<any>;
-
-        if (req.body instanceof FormData) {
-          // For FormData requests, we must not set the 'Content-Type' header.
-          // The browser will add it with the correct boundary.
-          cloned = req.clone({
-            headers: req.headers.set('Authorization', `Bearer ${token}`).delete('Content-Type')
-          });
-          console.log('Cloned multipart request headers:', cloned.headers.get('Authorization'));
-        } else {
-          cloned = req.clone({
-            setHeaders: {
-              Authorization: `Bearer ${token}`
-            }
-          });
-          console.log('Cloned request headers:', cloned.headers.get('Authorization'));
-        }
-        return next(cloned);
-      } else {
-        console.log('No token found or not logged in, request not modified.');
-        return next(req);
+  return next(req).pipe(
+    catchError((error) => {
+      if (error instanceof HttpErrorResponse && error.status === 401) {
+        return authService.refreshToken().pipe(
+          switchMap((response: any) => {
+            localStorage.setItem('token', response.token);
+            req = req.clone({
+              setHeaders: {
+                Authorization: `Bearer ${response.token}`,
+              },
+            });
+            return next(req);
+          }),
+          catchError(() => {
+            authService.logout();
+            return throwError(() => new Error('Session expired.'));
+          })
+        );
       }
+      return throwError(() => error);
     })
   );
 };

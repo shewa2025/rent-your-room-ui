@@ -13,15 +13,40 @@
       <mat-card-header>
         <mat-card-title>{{ property.title }}</mat-card-title>
       </mat-card-header>
-      <mat-card-content>
-        <p class="address">{{ property.address }}</p>
-        <p>{{ property.description }}</p>
-        <p class="price">{{ property.price | currency }} / night</p>
-      </mat-card-content>
-    </mat-card>
-  </div>
-
-  <div *ngIf="!isLoading && !property">
-    <p>Property not found.</p>
-  </div>
-</div>
+      
+          <mat-card-content>
+              <p class="address">{{ property.address }}</p>
+              <p>{{ property.description }}</p>
+              <p class="price">{{ property.price | currency }} / night</p>
+            </mat-card-content>
+          </mat-card>
+      
+          <div class="reviews-section">
+            <h2>Reviews</h2>
+            <div *ngIf="property.reviews && property.reviews.length > 0; else noReviews">
+              <mat-card *ngFor="let review of property.reviews" class="review-card">
+                <mat-card-header>
+                  <mat-card-title>{{ review.username }}</mat-card-title>
+                  <mat-card-subtitle>Rating: {{ review.rating }} / 5</mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content>
+                  <p>{{ review.comment }}</p>
+                </mat-card-content>
+              </mat-card>
+            </div>
+            <ng-template #noReviews>
+              <p>No reviews yet. Be the first to leave a review!</p>
+            </ng-template>
+      
+            <div *ngIf="authService.isLoggedIn">
+              <h3>Leave a Review</h3>
+              <app-review-form [roomId]="property.id" (reviewSubmitted)="reloadProperty()"></app-review-form>
+            </div>
+          </div>
+        </div>
+      
+        <div *ngIf="!isLoading && !property">
+          <p>Property not found.</p>
+        </div>
+      </div>
+      

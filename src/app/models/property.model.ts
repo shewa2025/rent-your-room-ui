@@ -1,5 +1,6 @@
 
 import { User } from './user.model';
+import { Review } from './review.model';
 
 export interface Property {
   id: string;
@@ -10,4 +11,5 @@ export interface Property {
   imageUrl: string;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   owner: User;
+  reviews?: Review[];
 }

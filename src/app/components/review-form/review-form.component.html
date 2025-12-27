@@ -1,0 +1,19 @@
+<form [formGroup]="reviewForm" (ngSubmit)="onSubmit()">
+  <mat-form-field appearance="fill">
+    <mat-label>Rating</mat-label>
+    <mat-select formControlName="rating">
+      <mat-option [value]="1">1 - Poor</mat-option>
+      <mat-option [value]="2">2 - Fair</mat-option>
+      <mat-option [value]="3">3 - Good</mat-option>
+      <mat-option [value]="4">4 - Very Good</mat-option>
+      <mat-option [value]="5">5 - Excellent</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Comment</mat-label>
+    <textarea matInput formControlName="comment" rows="3"></textarea>
+  </mat-form-field>
+
+  <button mat-raised-button color="primary" type="submit" [disabled]="reviewForm.invalid">Submit Review</button>
+</form>
