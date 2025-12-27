@@ -81,9 +81,11 @@ export class PropertyFormComponent implements OnInit, OnDestroy {
     if (this.propertyForm.valid && this.selectedFile) {
       this.isSubmitting = true;
       const formData = new FormData();
-      Object.keys(this.propertyForm.value).forEach(key => {
-        formData.append(key, this.propertyForm.value[key]);
-      });
+      
+      // Backend expects a 'room' part with JSON data and an 'image' part for the file.
+      const roomData = this.propertyForm.value;
+      formData.append('room', new Blob([JSON.stringify(roomData)], { type: 'application/json' }));
+      
       formData.append('image', this.selectedFile, this.selectedFile.name);
 
       this.propertyService.createProperty(formData)
